@@ -143,6 +143,10 @@ export const updateHistorico = async (historico: any) => {
 };
 
 export const updateHistoricoExe = async (historico: any) => {
+  let dataformatada = format(
+    endOfDay(new Date()),
+    "yyyy-MM-dd'T'03:00:00.000+00:00"
+  );
   return prisma.historicoExercicios.upsert({
     where: {
       aluno: parseInt(historico.aluno),
@@ -151,8 +155,8 @@ export const updateHistoricoExe = async (historico: any) => {
       histexe: {
         push: {
           grupo: historico.treino,
-          data: new Date(),
-          carga: historico.carga,
+          data: dataformatada,
+          carga: historico.carga + " kg",
           nome: historico.exenome,
           obs: historico.obs,
         },
@@ -162,10 +166,33 @@ export const updateHistoricoExe = async (historico: any) => {
       aluno: parseInt(historico.aluno),
       histexe: {
         grupo: historico.treino,
-        data: new Date(),
-        carga: historico.carga,
+        data: dataformatada,
+        carga: historico.carga + " kg",
         nome: historico.exenome,
         obs: historico.obs,
+      },
+    },
+  });
+};
+
+export const deleteHistoricoExe = async (treino: any) => {
+  let dataformatada = format(
+    endOfDay(new Date()),
+    "yyyy-MM-dd'T'03:00:00.000+00:00"
+  );
+
+  return prisma.historicoExercicios.update({
+    where: {
+      aluno: parseInt(treino.aluno),
+    },
+    data: {
+      histexe: {
+        deleteMany: {
+          where: {
+            nome: treino.exenome,
+            data: dataformatada,
+          },
+        },
       },
     },
   });
